@@ -1,3 +1,4 @@
+# data_ingestion.py
 import os
 import sys
 from src.exception import CustomException
@@ -8,6 +9,8 @@ from dataclasses import dataclass
 
 from src.components.data_transformation import DataTransformation, DataTransformationConfig
 from src.components.model_trainer import ModelTrainer, ModelTrainerConfig
+from src.components.data_transformation_clarity import DataTransformationClarity
+from src.components.model_trainer_clarity import ModelTrainerClarity
 
 # Initialize Data Ingestion Configuration
 @dataclass
@@ -54,13 +57,18 @@ class DataIngestion:
             logging.info('Exception occured at Data Ingestion stage')
             raise CustomException(e, sys)
     
-# Run Data ingestion
 if __name__ == '__main__':
     obj = DataIngestion()
     train_data, test_data = obj.initate_data_ingestion()
 
-    data_transformation = DataTransformation()
-    train_arr, test_arr, _ = data_transformation.initate_data_transformation(train_data,test_data)
+    data_transformation = DataTransformationClarity()  # <-- specify target
+    train_arr, test_arr, preprocessor = data_transformation.initate_data_transformation(train_data, test_data)
 
-    modeltrainer = ModelTrainer()
-    modeltrainer.initate_model_training(train_arr, test_arr)
+    modeltrainer = ModelTrainerClarity(model_type='classification')  # <-- classification model
+    model = modeltrainer.initate_model_training(train_arr, test_arr)
+
+    # Save with clarity-specific names
+    import joblib, os
+    os.makedirs('artifacts', exist_ok=True)
+    joblib.dump(model, 'artifacts/clarity_model.pkl')
+    joblib.dump(preprocessor, 'artifacts/clarity_preprocessor.pkl')

@@ -11,4 +11,6 @@ flask
 flask_cors
 lime
 gunicorn
+tensorflow
+kera
 #-e .

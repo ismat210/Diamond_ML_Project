@@ -63,4 +63,5 @@ class CustomData:
         except Exception as e:
             logging.info('Exception Occured in prediction pipeline')
             raise CustomException(e,sys)
+        
             
